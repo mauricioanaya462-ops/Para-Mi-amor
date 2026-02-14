@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Mi Amor  </title>
+
+<style>
+html,body{
+margin:0;
+padding:0;
+width:100%;
+height:100%;
+overflow:hidden;
+background:radial-gradient(circle at top,#14001c,#0a0a0a);
+font-family:Arial;
+}
+#mensaje{
+position:fixed;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+color:white;
+font-size:22px;
+text-shadow:0 0 25px #ff2bd6;
+z-index:10;
+}
+#btn{
+position:fixed;
+bottom:25px;
+left:50%;
+transform:translateX(-50%);
+padding:14px 30px;
+border:none;
+border-radius:30px;
+background:#c000ff;
+color:white;
+font-size:16px;
+box-shadow:0 0 30px #ff00ff;
+z-index:10;
+cursor:pointer;
+}
+canvas{display:block;}
+</style>
+</head>
+
+<body>
+
+<div id="mensaje"> Abyy Mmol.. </div>
+<button id="btn">Tocaa Aquii</button>
+
+<audio id="musica" loop>
+<source src="YaBorracho.mp3" type="audio/mpeg">
+</audio>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x1a001f, 0.00045);
+
+const camera = new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,0.1,10000);
+camera.position.z = 1500;
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+document.body.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.minDistance = 600;
+controls.maxDistance = 4000;
+
+/*  CORAZÓN MORADO NEÓN */
+
+function crearCorazon(){
+const canvas=document.createElement("canvas");
+canvas.width=128;
+canvas.height=128;
+const ctx=canvas.getContext("2d");
+
+ctx.fillStyle="#c000ff";
+ctx.shadowColor="#ff00ff";
+ctx.shadowBlur=60;
+
+ctx.beginPath();
+ctx.moveTo(64,90);
+ctx.bezierCurveTo(120,40,120,20,64,50);
+ctx.bezierCurveTo(8,20,8,40,64,90);
+ctx.fill();
+
+return new THREE.CanvasTexture(canvas);
+}
+
+const heartTexture = crearCorazon();
+
+const heartGeo = new THREE.BufferGeometry();
+const heartCount = 6000;
+const heartPositions = new Float32Array(heartCount*3);
+
+for(let i=0;i<heartCount;i++){
+let t = Math.random()*Math.PI*2;
+let x = 16*Math.pow(Math.sin(t),3)*70;
+let y = (13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))*45;
+let z = (Math.random()-0.5)*400;
+
+heartPositions[i*3]=x;
+heartPositions[i*3+1]=y;
+heartPositions[i*3+2]=z;
+}
+
+heartGeo.setAttribute("position",new THREE.BufferAttribute(heartPositions,3));
+
+const heartMat = new THREE.PointsMaterial({
+map:heartTexture,
+transparent:true,
+depthWrite:false,
+blending:THREE.AdditiveBlending,
+size:50,
+color:0xc000ff,
+opacity:1
+});
+
+const heart = new THREE.Points(heartGeo,heartMat);
+scene.add(heart);
+
+/*  ESTRELLAS */
+
+const starGeo = new THREE.BufferGeometry();
+const starCount = 5000;
+const starPositions = new Float32Array(starCount*3);
+
+for(let i=0;i<starCount;i++){
+starPositions[i*3]=(Math.random()-0.5)*8000;
+starPositions[i*3+1]=(Math.random()-0.5)*8000;
+starPositions[i*3+2]=(Math.random()-0.5)*8000;
+}
+
+starGeo.setAttribute("position",new THREE.BufferAttribute(starPositions,3));
+
+const starMat = new THREE.PointsMaterial({
+color:0xffffff,
+size:6
+});
+
+scene.add(new THREE.Points(starGeo,starMat));
+
+/*  PALABRAS ROJO NEÓN */
+
+const palabras=[
+"Hoy","Me declaro","Un Loco",
+"Obsesionado","y no te","Espantes","No es nada",
+"Malo","Por eso es que","Tu eres","Mi amor","Anhelado",
+"Cuando","Te vii","Abyy","Peshosaa",
+
+];
+
+const textos=[];
+
+function crearTexto(texto){
+const canvas=document.createElement("canvas");
+canvas.width=1024;
+canvas.height=256;
+const ctx=canvas.getContext("2d");
+
+ctx.font="bold 135px Arial";
+ctx.textAlign="center";
+ctx.textBaseline="middle";
+
+/* ROJO NEÓN */
+ctx.shadowColor="#ff0000";
+ctx.shadowBlur=100;
+ctx.fillStyle="#ff1a1a";
+ctx.fillText(texto,512,128);
+
+const texture=new THREE.CanvasTexture(canvas);
+
+const material=new THREE.SpriteMaterial({
+map:texture,
+transparent:true,
+depthWrite:false,
+blending:THREE.AdditiveBlending
+});
+
+const sprite=new THREE.Sprite(material);
+sprite.scale.set(580,170,1);
+return sprite;
+}
+
+/* Distribución esférica */
+
+for(let i=0;i<350;i++){
+
+let palabra = palabras[Math.floor(Math.random()*palabras.length)];
+let texto = crearTexto(palabra);
+
+let radius = 800 + Math.random()*3500;
+let theta = Math.random()*Math.PI*2;
+let phi = Math.acos((Math.random()*2)-1);
+
+texto.userData = {
+radius: radius,
+theta: theta,
+phi: phi,
+speed: 0.0015 + Math.random()*0.002
+};
+
+scene.add(texto);
+textos.push(texto);
+}
+
+/*  ANIMACIÓN */
+
+function animate(){
+requestAnimationFrame(animate);
+
+heart.rotation.y += 0.002;
+
+/* Pulso + brillo al alejar */
+let tiempo=Date.now()*0.003;
+let pulso=(Math.sin(tiempo)+1)/2;
+
+let distancia=camera.position.length();
+let intensidad=THREE.MathUtils.clamp((distancia-600)/(4000-600),0,1);
+
+heartMat.size=50+pulso*20+intensidad*40;
+heartMat.opacity=0.8+pulso*0.4+intensidad*0.3;
+
+/* Movimiento esférico */
+textos.forEach(t=>{
+
+t.userData.theta += t.userData.speed;
+
+let r = t.userData.radius;
+let theta = t.userData.theta;
+let phi = t.userData.phi;
+
+t.position.x = r * Math.sin(phi) * Math.cos(theta);
+t.position.y = r * Math.cos(phi);
+t.position.z = r * Math.sin(phi) * Math.sin(theta);
+
+t.lookAt(0,0,0);
+
+});
+
+controls.update();
+renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener("resize",()=>{
+camera.aspect=window.innerWidth/window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+document.getElementById("btn").onclick=()=>{
+document.getElementById("musica").play();
+document.getElementById("btn").style.display="none";
+};
+
+</script>
+</body>
+</html>
