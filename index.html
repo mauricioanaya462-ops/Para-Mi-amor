@@ -74,7 +74,7 @@ controls.enableDamping = true;
 controls.minDistance = 600;
 controls.maxDistance = 4000;
 
-/*  CORAZÓN MORADO NEÓN */
+/*  CORAZÃ“N MORADO NEÃ“N */
 
 function crearCorazon(){
 const canvas=document.createElement("canvas");
@@ -148,7 +148,7 @@ size:6
 
 scene.add(new THREE.Points(starGeo,starMat));
 
-/*  PALABRAS ROJO NEÓN */
+/*  PALABRAS ROJO NEÃ“N */
 
 const palabras=[
 "Hoy","Me declaro","Un Loco",
@@ -170,7 +170,7 @@ ctx.font="bold 135px Arial";
 ctx.textAlign="center";
 ctx.textBaseline="middle";
 
-/* ROJO NEÓN */
+/* ROJO NEÃ“N */
 ctx.shadowColor="#ff0000";
 ctx.shadowBlur=100;
 ctx.fillStyle="#ff1a1a";
@@ -190,7 +190,7 @@ sprite.scale.set(580,170,1);
 return sprite;
 }
 
-/* Distribución esférica */
+/* DistribuciÃ³n esfÃ©rica */
 
 for(let i=0;i<350;i++){
 
@@ -212,7 +212,7 @@ scene.add(texto);
 textos.push(texto);
 }
 
-/*  ANIMACIÓN */
+/*  ANIMACIÃ“N */
 
 function animate(){
 requestAnimationFrame(animate);
@@ -229,7 +229,7 @@ let intensidad=THREE.MathUtils.clamp((distancia-600)/(4000-600),0,1);
 heartMat.size=50+pulso*20+intensidad*40;
 heartMat.opacity=0.8+pulso*0.4+intensidad*0.3;
 
-/* Movimiento esférico */
+/* Movimiento esfÃ©rico */
 textos.forEach(t=>{
 
 t.userData.theta += t.userData.speed;
